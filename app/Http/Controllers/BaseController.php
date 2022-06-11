@@ -22,4 +22,20 @@ class BaseController extends Controller
             ->get()
             ->toArray();
     }
+
+    protected function responseJson(
+        $data = null,
+        $message = 'Success',
+        $code = 200,
+        $httpCode = 200
+    ) {
+        return response(
+            [
+                'code' => $code,
+                'message' => $message,
+                'data' => $data
+            ],
+            $httpCode
+        )->header('Content-type', 'application/json');
+    }
 }

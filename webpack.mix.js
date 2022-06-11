@@ -30,6 +30,9 @@ mix.scripts([
     'node_modules/admin-lte/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.js',
     'node_modules/admin-lte/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.js',
     'node_modules/admin-lte/plugins/bootstrap-switch/js/bootstrap-switch.js',
+    'node_modules/admin-lte/plugins/toastr/toastr.min.js',
+    'node_modules/admin-lte/plugins/jquery-validation/jquery.validate.min.js',
+    'node_modules/admin-lte/plugins/jquery-validation/additional-methods.min.js',
 ], 'public/js/plugin.js')
     .sourceMaps();
 
@@ -56,4 +59,7 @@ mix.copy(
 ).copy(
     'node_modules/admin-lte/plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.js.map',
     'public/js/bootstrap-colorpicker.js.map'
+).copy(
+    'node_modules/admin-lte/plugins/toastr/toastr.js.map',
+    'public/js/toastr.js.map'
 );

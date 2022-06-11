@@ -61,6 +61,32 @@ $.fn.serializeObject = function () {
     return o;
 };
 
+$.fn.formHandler = function (
+    validator = {},
+    action = function () {
+        showMessage('You haven\'t register callback yet', 'error')
+    }
+) {
+    this.validate({
+        ...validator,
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.form-group').append(error);
+            element.closest('.input-group').append(error);
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+        },
+        submitHandler: function (form) {
+            action(form)
+        }
+    })
+}
+
 $("document").ready(function () {
 
     $(".select2").select2({
@@ -73,3 +99,52 @@ $("document").ready(function () {
     });
 
 });
+
+function showMessage(message, type = 'success') {
+    switch (type) {
+        case 'warning':
+            toastr.warning(message)
+            break;
+        case 'error':
+            toastr.error(message)
+            break;
+        case 'info':
+            toastr.info(message)
+            break;
+        default:
+            toastr.success(message)
+            break;
+    }
+}
+
+function disable(view) {
+    view.attr('disabled', 'disabled')
+}
+
+function enable(view) {
+    view.removeAttr('disabled')
+}
+
+let loadingContentHolder = ''
+
+function loading(view, show) {
+    if (show) {
+        loadingContentHolder = view.html()
+        view.html('<img class="loader" src="/img/loader.svg">');
+    } else {
+        view.html(loadingContentHolder);
+    }
+}
+
+function swap(origin, target, simultaneously = true) {
+    let originObject = (typeof origin === 'string') ? $(origin) : origin
+    let targetObject = (typeof target === 'string') ? $(target) : target
+    if (simultaneously) {
+        originObject.slideUp();
+        targetObject.slideDown();
+    } else {
+        originObject.slideUp(function () {
+            targetObject.slideDown();
+        });
+    }
+}

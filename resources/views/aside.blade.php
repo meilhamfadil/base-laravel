@@ -68,7 +68,7 @@
                                          <li class="nav-item">
                                              <a href="{{ url($submenu['link']) }}" class="nav-link"
                                                  target="{{ $submenu['target'] }}">
-                                                 <i class="fas fa-circle nav-icon"></i>
+                                                 <i class="far fa-circle nav-icon"></i>
                                                  <p>{{ $submenu['name'] }}</p>
                                              </a>
                                          </li>

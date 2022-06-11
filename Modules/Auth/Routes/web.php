@@ -11,6 +11,11 @@
 |
 */
 
-Route::prefix('auth')->group(function() {
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('auth')->group(function () {
     Route::get('/', 'AuthController@index');
+    Route::get('/login', 'LoginController@index');
+    Route::post('/login/check', 'LoginController@authenticate');
+    Route::post('/login/forgot', 'LoginController@forgot');
 });
