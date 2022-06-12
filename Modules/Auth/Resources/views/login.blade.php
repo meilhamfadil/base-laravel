@@ -66,6 +66,13 @@
             </div>
         </div>
 
+        <div class="card" id="container-forgot-message" style="display: none">
+            <div class="card-body login-card-body">
+                <p class="login-box-msg">Tautan untuk pengaturan ulang kata sandi telah dikirimkan.</p>
+                <p class="login-box-msg pb-0">Silahkan cek email anda.</p>
+            </div>
+        </div>
+
     </div>
 @endsection
 
@@ -94,7 +101,6 @@
             }, doForgot);
 
 
-
             $('#action-forgot').on('click', function(e) {
                 swap('#container-login', '#container-forgot');
             });
@@ -117,8 +123,14 @@
                     loading(submitButton, true)
                 },
                 success: function(payload, message, xhr) {
-                    if (payload.code != 200)
+                    if (payload.code != 200) {
                         showMessage(payload.message, 'error')
+                    } else {
+                        showMessage(payload.message)
+                        setTimeout(() => {
+                            redirect('dashboard')
+                        }, 500);
+                    }
                 },
                 error: function(xhr, message, error) {
                     let payload = xhr.responseJSON
@@ -145,6 +157,8 @@
                 success: function(payload, message, xhr) {
                     if (payload.code != 200)
                         showMessage(payload.message, 'error')
+                    else
+                        swap('#container-forgot', '#container-forgot-message')
                 },
                 error: function(xhr, message, error) {
                     let payload = xhr.responseJSON

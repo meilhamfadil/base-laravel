@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Menu extends Model
+class Role extends Model
 {
+    use HasFactory;
 
-    protected $table = 'menu';
-
+    protected $table = 'role';
+    
     /**
      * The attributes that should be hidden for serialization.
      *

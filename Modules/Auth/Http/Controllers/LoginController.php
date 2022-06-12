@@ -2,13 +2,13 @@
 
 namespace Modules\Auth\Http\Controllers;
 
-use App\Http\Controllers\BaseController;
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class LoginController extends BaseController
+class LoginController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -27,7 +27,7 @@ class LoginController extends BaseController
         ]);
 
         if (Auth::attempt($credential)) {
-            $request->session->regenerate();
+            $request->session()->regenerate();
             return $this->responseJson();
         }
 
@@ -49,9 +49,15 @@ class LoginController extends BaseController
 
         return $this->responseJson(
             $credential,
-            !empty($candidate) ? 'Do Forgot' : 'Stop',
+            !empty($candidate) ? 'Email ditemukan' : 'Email tidak ditemukan',
             !empty($candidate) ? 200 : 404,
             !empty($candidate) ? 200 : 404
         );
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        return redirect(url('/auth/login'));
     }
 }

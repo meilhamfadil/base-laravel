@@ -100,19 +100,26 @@ $("document").ready(function () {
 
 });
 
-function showMessage(message, type = 'success') {
+function showMessage(message, type = 'success', body = null) {
+    let temp = null
+    if (body !== null) {
+        temp = message;
+        message = body;
+        body = temp;
+    }
+
     switch (type) {
         case 'warning':
-            toastr.warning(message)
+            toastr.warning(message, body)
             break;
         case 'error':
-            toastr.error(message)
+            toastr.error(message, body)
             break;
         case 'info':
-            toastr.info(message)
+            toastr.info(message, body)
             break;
         default:
-            toastr.success(message)
+            toastr.success(message, body)
             break;
     }
 }
@@ -147,4 +154,10 @@ function swap(origin, target, simultaneously = true) {
             targetObject.slideDown();
         });
     }
+}
+
+function redirect(target) {
+    if (!target.startsWith('/'))
+        target = '/' + target
+    $(location).prop('href', APP_URL + target)
 }

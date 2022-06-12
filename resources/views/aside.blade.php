@@ -15,7 +15,7 @@
                  <img src="/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
              </div>
              <div class="info">
-                 <a href="#" class="d-block">Users</a>
+                 <a href="#" class="d-block">{{ auth()->user()->name }}</a>
              </div>
          </div>
 
@@ -25,57 +25,35 @@
                  data-accordion="false">
 
                  @php
-                     $appMenu = isset($app_menu) ? $app_menu : [];
-                     $labels = array_filter($appMenu, function ($item) {
-                         return $item['parent'] == '0' && $item['type'] == 'label';
-                     });
-                     $padding = 'padding: 0rem 1rem .5rem !important;';
+                     $appmenu = isset($app_menu) ? $app_menu : [];
                  @endphp
-
-                 @foreach ($labels as $label)
-                     <li class="nav-header" style="{{ $padding }}">{{ strtoupper($label['name']) }}</li>
-
-                     @php
-                         $padding = '';
-                         $menus = array_filter($appMenu, function ($item) use ($label) {
-                             return $item['parent'] == $label['id'];
-                         });
-                     @endphp
-
-                     @foreach ($menus as $menu)
-                         @php
-                             $submenus = array_filter($appMenu, function ($item) use ($menu) {
-                                 return $item['parent'] == $menu['id'];
-                             });
-                             $submenuclass = empty($submenus) ? '' : 'has-treeview';
-                         @endphp
-
-                         <li class="nav-item {{ $submenuclass }}">
-                             <a href="{{ url($menu['link']) }}" class="nav-link"
-                                 target="{{ $menu['target'] }}">
-                                 <i class="nav-icon fas fa-{{ $menu['icon'] }}"></i>
+                 @foreach ($appmenu as $label)
+                     <li class="nav-header" style="{{ $label->padding }}">{{ $label->name }}</li>
+                     @foreach ($label->sub as $menu)
+                         <li class="nav-item {{ $menu->subclass }} {{ $menu->open }}">
+                             <a href="{{ url($menu->link) }}" class="nav-link {{ $menu->active }}"
+                                 target="{{ $menu->target }}">
+                                 <i class="nav-icon fas fa-{{ $menu->icon }}"></i>
                                  <p>
-                                     {{ $menu['name'] }}
-                                     @if (!empty($submenus))
+                                     {{ $menu->name }}
+                                     @if (!empty($menu->sub))
                                          <i class="right fas fa-angle-left"></i>
                                      @endif
                                  </p>
                              </a>
-
-                             @if (!empty($submenus))
+                             @if (!empty($menu->sub))
                                  <ul class="nav nav-treeview">
-                                     @foreach ($submenus as $submenu)
+                                     @foreach ($menu->sub as $sub)
                                          <li class="nav-item">
-                                             <a href="{{ url($submenu['link']) }}" class="nav-link"
-                                                 target="{{ $submenu['target'] }}">
+                                             <a href="{{ url($sub->link) }}" class="nav-link {{ $sub->active }}"
+                                                 target="{{ $sub->target }}">
                                                  <i class="far fa-circle nav-icon"></i>
-                                                 <p>{{ $submenu['name'] }}</p>
+                                                 <p>{{ $sub->name }}</p>
                                              </a>
                                          </li>
                                      @endforeach
                                  </ul>
                              @endif
-
                          </li>
                      @endforeach
                  @endforeach

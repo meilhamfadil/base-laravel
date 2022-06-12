@@ -3,12 +3,10 @@
 namespace Modules\Master\Http\Controllers;
 
 use App\Http\Controllers\AdminController;
-use App\Models\Menu;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
-use Yajra\DataTables\DataTables;
 
-class MenuController extends AdminController
+class RoleController extends AdminController
 {
     /**
      * Display a listing of the resource.
@@ -16,16 +14,7 @@ class MenuController extends AdminController
      */
     public function index()
     {
-        return view('master::menu', $this->content);
-    }
-
-    public function datatable(Request $request)
-    {
-        $params = $request->post('datatable');
-        $query = Menu::query();
-        if (isset($params['type']))
-            $query->where('type', 'like', '%' . $params['type'] . '%');
-        return DataTables::of($query)->toJson();
+        return view('master::role', $this->content);
     }
 
     /**

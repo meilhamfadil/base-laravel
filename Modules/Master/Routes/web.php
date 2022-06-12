@@ -13,12 +13,17 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('master')->group(function () {
+Route::prefix('master')
+    ->middleware(['auth'])
+    ->group(function () {
+        Route::get('/', 'MasterController@index');
 
-    Route::get('/', 'MasterController@index');
+        Route::prefix('/menu')->group(function () {
+            Route::get('/', 'MenuController@index')->name('master-menu');
+            Route::post('/datatable', 'MenuController@datatable')->name('master-menu-datatable');
+        });
 
-    Route::prefix('/menu')->group(function () {
-        Route::get('/', 'MenuController@index');
-        Route::post('/datatable', 'MenuController@datatable');
-    });
-});
+        Route::prefix('/role')->group(function () {
+            Route::get('/', 'RoleController@index')->name('master-role');
+        });
+    });;

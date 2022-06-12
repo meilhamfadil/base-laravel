@@ -17,7 +17,7 @@
         </div>
     </section>
 
-    <section class="content">
+    <section class="content pb-1">
 
         <div class="container-fluid">
 
@@ -63,9 +63,6 @@
                             </tr>
                         </thead>
                     </table>
-                </div>
-                <div class="card-footer">
-                    Footer
                 </div>
             </div>
         </div>

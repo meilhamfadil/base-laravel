@@ -11,6 +11,10 @@
 |
 */
 
-Route::prefix('dashboard')->group(function() {
-    Route::get('/', 'DashboardController@index');
-});
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('dashboard')
+    ->middleware(['auth'])
+    ->group(function () {
+        Route::get('/', 'DashboardController@index')->name('dashboard');
+    });

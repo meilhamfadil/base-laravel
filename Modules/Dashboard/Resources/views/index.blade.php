@@ -1,9 +1,12 @@
-@extends('dashboard::layouts.master')
+@extends('master')
 
 @section('content')
     <h1>Hello World</h1>
-
-    <p>
-        This view is loaded from module: {!! config('dashboard.name') !!}
-    </p>
+    @can('isSuperadmin')
+        Saya Super Admin
+    @elsecan('isMasterManager')
+        Saya Master Manager
+    @else
+        Saya Tidak Punya Role
+    @endcan
 @endsection

@@ -13,9 +13,19 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('auth')->group(function () {
-    Route::get('/', 'AuthController@index');
-    Route::get('/login', 'LoginController@index');
-    Route::post('/login/check', 'LoginController@authenticate');
-    Route::post('/login/forgot', 'LoginController@forgot');
-});
+Route::prefix('auth')
+    ->group(function () {
+        Route::get('/', 'LoginController@index')
+            ->middleware(['guest'])
+            ->name('login');
+
+        Route::prefix('/login')
+            ->middleware(['guest'])
+            ->group(function () {
+                Route::get('/', 'LoginController@index')->name('login');
+                Route::post('/check', 'LoginController@authenticate')->name('authenticate');
+                Route::post('/forgot', 'LoginController@forgot')->name('forgot');
+            });
+
+        Route::get('/logout', 'LoginController@logout')->name('logout');
+    });
