@@ -33,6 +33,7 @@ mix.scripts([
     'node_modules/admin-lte/plugins/toastr/toastr.min.js',
     'node_modules/admin-lte/plugins/jquery-validation/jquery.validate.min.js',
     'node_modules/admin-lte/plugins/jquery-validation/additional-methods.min.js',
+    'node_modules/jquery-confirm/dist/jquery-confirm.min.js',
 ], 'public/js/plugin.js')
     .sourceMaps();
 
@@ -49,6 +50,7 @@ mix.styles([
     'node_modules/admin-lte/plugins/select2/css/select2.css',
     'node_modules/admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.css',
     'node_modules/admin-lte/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.css',
+    'node_modules/jquery-confirm/dist/jquery-confirm.min.css',
     'node_modules/admin-lte/dist/css/adminlte.css',
 ], 'public/css/plugin.css')
     .sourceMaps();

@@ -2,19 +2,18 @@ $.extend($.fn.dataTable.defaults, {
     serverSide: true,
     processing: true,
     ajax: {
-        url: '',
         type: 'post',
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         data: function (d) {
-            d._token = $('input[name=_token]').val();
             var data = $.extend({}, d, (typeof buildDatatableParam === 'function') ? buildDatatableParam() : {});
             return data;
         }
     },
-    responsive: true,
     dom: '<"row"<"col-6"l><"col-6 text-right"f>>t<"row"<"col-6"i><"col-6 text-right"p>>r',
+    responsive: true,
+    autoWidth: false,
     lengthMenu: [
         [5, 10, 25, 50, -1],
         [5, 10, 25, 50, 'Semua'],
@@ -158,6 +157,53 @@ function swap(origin, target, simultaneously = true) {
 
 function redirect(target) {
     if (!target.startsWith('/'))
-        target = '/' + target
-    $(location).prop('href', APP_URL + target)
+        target = '/' + target;
+    $(location).prop('href', APP_URL + target);
+}
+
+function url(target) {
+    if (!target.startsWith('/'))
+        target = '/' + target;
+    return APP_URL + target;
+}
+
+$.fn.setOnActionClickListener = function (
+    action
+) {
+    $(this).on('click', '.datatable-action', function () {
+        const dataSource = $(this).parent().data('data');
+        const data = JSON.parse(decodeURI(dataSource));
+        const type = $(this).data('type');
+        action(type, data)
+    });
+}
+
+function tableAction(data, option = {}, label = 'Aksi') {
+    return `<div class="container-action">
+        <span class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
+            ${label} <span class="caret"></span>
+        </span>
+        <div class="dropdown-menu" data-data="${encodeURI(JSON.stringify(data))}">
+            ${option()}            
+        </div>
+    </div>`;
+}
+
+function actionOption(
+    label,
+    type
+) {
+    return `<a class="dropdown-item datatable-action" data-type="${type}" href="#">${label}</a>`;
+}
+
+function actionDivider() {
+    return `<div class="dropdown-divider"></div>`;
+}
+
+function getHeaderToken() {
+    return {
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    }
 }

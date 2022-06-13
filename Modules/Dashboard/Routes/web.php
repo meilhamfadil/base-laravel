@@ -14,7 +14,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('dashboard')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'role'])
     ->group(function () {
         Route::get('/', 'DashboardController@index')->name('dashboard');
     });

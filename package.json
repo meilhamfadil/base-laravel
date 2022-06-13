@@ -21,6 +21,7 @@
     "dependencies": {
         "admin-lte": "3.0",
         "datatables.net": "^1.12.1",
+        "jquery-confirm": "^3.3.4",
         "sizzle": "^2.3.6"
     }
 }

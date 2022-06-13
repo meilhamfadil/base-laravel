@@ -6,6 +6,8 @@ use App\Models\Menu;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Request;
 
 class AdminController extends Controller
 {
@@ -22,7 +24,6 @@ class AdminController extends Controller
 
     private function getMenu()
     {
-        $result = [];
         $source =  Menu::where('deleted_at', null)
             ->orderBy('parent')
             ->orderBy('order')

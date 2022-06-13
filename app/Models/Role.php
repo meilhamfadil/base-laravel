@@ -10,7 +10,7 @@ class Role extends Model
     use HasFactory;
 
     protected $table = 'role';
-    
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -20,5 +20,16 @@ class Role extends Model
         'deleted_at',
         'created_at',
         'updated_at',
+    ];
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
     ];
 }

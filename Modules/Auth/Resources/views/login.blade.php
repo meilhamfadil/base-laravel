@@ -116,8 +116,8 @@
             $.ajax({
                 url: $(form).attr('action'),
                 data: $(form).serializeObject(),
-                type: 'POST',
-                dataType: 'JSON',
+                type: POST,
+                dataType: JSON_DATA,
                 beforeSend: function() {
                     disable(submitButton)
                     loading(submitButton, true)
@@ -148,8 +148,8 @@
             $.ajax({
                 url: $(form).attr('action'),
                 data: $(form).serializeObject(),
-                type: 'POST',
-                dataType: 'JSON',
+                type: POST,
+                dataType: JSON_DATA,
                 beforeSend: function() {
                     disable(submitButton)
                     loading(submitButton, true)

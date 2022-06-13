@@ -19,3 +19,9 @@ const VALIDATOR_MESSAGES = {
         minlength: 'Kata kunci minimal 5 huruf'
     }
 }
+
+const POST = 'post';
+const GET = 'get';
+const PUT = 'put';
+const DELETE = 'delete';
+const JSON_DATA = 'json';

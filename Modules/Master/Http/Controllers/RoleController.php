@@ -3,8 +3,12 @@
 namespace Modules\Master\Http\Controllers;
 
 use App\Http\Controllers\AdminController;
+use App\Models\Role;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\Client\Request as ClientRequest;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Request as HttpFoundationRequest;
+use Yajra\DataTables\DataTables;
 
 class RoleController extends AdminController
 {
@@ -17,6 +21,12 @@ class RoleController extends AdminController
         return view('master::role', $this->content);
     }
 
+    public function datatable(Request $request)
+    {
+        $params = $request->post('datatable');
+        $query = Role::query();
+        return DataTables::of($query)->toJson();
+    }
     /**
      * Show the form for creating a new resource.
      * @return Renderable
@@ -33,7 +43,36 @@ class RoleController extends AdminController
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'slug' => 'required',
+        ]);
+
+        if ($request->post('id') != null) {
+            $request->validate([
+                'id' => 'required'
+            ]);
+            $data = Role::where('id', $request->post('id'))
+                ->update([
+                    'name' => $request->post('name'),
+                    'slug' => $request->post('slug'),
+                    'description' => $request->post('description'),
+                ]);
+
+            return $this->responseJson(
+                $data
+            );
+        } else {
+            $insertId = Role::create([
+                'name' => $request->post('name'),
+                'slug' => $request->post('slug'),
+                'description' => $request->post('description'),
+            ])->id;
+        }
+
+        return $this->responseJson(
+            $insertId
+        );
     }
 
     /**
@@ -72,8 +111,15 @@ class RoleController extends AdminController
      * @param int $id
      * @return Renderable
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        $id = $request->post('id');
+        $result = Role::destroy($id);
+        return $this->responseJson(
+            $result,
+            ($result == 0) ? 'Gagal menghapus data' : 'Data berhasil dihapus',
+            ($result == 0) ? 400 : 200,
+            ($result == 0) ? 400 : 200
+        );
     }
 }

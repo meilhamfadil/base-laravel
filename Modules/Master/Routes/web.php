@@ -12,9 +12,10 @@
 */
 
 use Illuminate\Support\Facades\Route;
+use Modules\Master\Http\Controllers\RoleController;
 
 Route::prefix('master')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'role'])
     ->group(function () {
         Route::get('/', 'MasterController@index');
 
@@ -25,5 +26,8 @@ Route::prefix('master')
 
         Route::prefix('/role')->group(function () {
             Route::get('/', 'RoleController@index')->name('master-role');
+            Route::post('/datatable', 'RoleController@datatable')->name('master-role-datatable');
+            Route::post('/store', 'RoleController@store')->name('master-role-store');
+            Route::delete('/remove', 'RoleController@destroy')->name('master-role-remove');
         });
     });;
