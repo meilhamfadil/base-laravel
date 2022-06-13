@@ -2,5 +2,6 @@
     "Landing": true,
     "Auth": true,
     "Dashboard": true,
-    "Master": true
+    "Master": true,
+    "System": true
 }

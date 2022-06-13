@@ -5,12 +5,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Master Hak Akses</h1>
+                    <h1>Master Fitur</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="#">Master</a></li>
-                        <li class="breadcrumb-item active">Hak Akses</li>
+                        <li class="breadcrumb-item active">Fitur</li>
                     </ol>
                 </div>
             </div>
@@ -23,27 +23,23 @@
 
             <div class="card" id="container-form" style="display: none">
                 <div class="card-header">
-                    <h3 class="card-title">Form Hak Akses</h3>
+                    <h3 class="card-title">Form Fitur</h3>
                     <div class="card-tools">
                         <button type="button" class="btn btn-tool close-form">
                             <i class="fas fa-times"></i></button>
                     </div>
                 </div>
-                <form action="{{ url('master/role/store') }}" id="form-role">
+                <form action="{{ url('system/feature/store') }}" id="form-role">
                     {{ csrf_field() }}
                     <input type="hidden" name="id">
                     <div class="card-body">
                         <div class="form-group">
                             <label>Nama</label>
-                            <input type="text" name="name" class="form-control" placeholder="Nama Akses">
+                            <input type="text" name="name" class="form-control" placeholder="Nama Fitur">
                         </div>
                         <div class="form-group">
-                            <label>Slug</label>
-                            <input type="text" name="slug" class="form-control" placeholder="Slug" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Deskripsi</label>
-                            <textarea name="description" class="form-control"></textarea>
+                            <label>Nama Routing</label>
+                            <input type="text" name="slug" class="form-control" placeholder="Nama Routing">
                         </div>
                         <button type="submit" class="btn btn-primary float-right">Simpan</button>
                     </div>
@@ -52,7 +48,7 @@
 
             <div class="card" id="container-table">
                 <div class="card-header">
-                    <h3 class="card-title">Hak Akses</h3>
+                    <h3 class="card-title">Fitur</h3>
                     <div class="card-tools">
                         <button type="button" class="btn btn-tool add">
                             <i class="fas fa-plus"></i></button>
@@ -63,9 +59,8 @@
                         <thead>
                             <tr>
                                 <td class="text-center">No</td>
-                                <td class="text-center">Nama</td>
-                                <td class="text-center">Slug</td>
-                                <td class="text-center">Deskripsi</td>
+                                <td class="text-center">Nama Fitur</td>
+                                <td class="text-center">Nama Routing</td>
                                 <td class="text-center"></td>
                             </tr>
                         </thead>
@@ -86,7 +81,7 @@
 
             datatable = $('table').DataTable({
                 ajax: {
-                    url: "/master/role/datatable"
+                    url: "/system/feature/datatable"
                 },
                 autoWidth: false,
                 columns: [{
@@ -105,9 +100,6 @@
                         data: 'slug'
                     },
                     {
-                        data: 'description'
-                    },
-                    {
                         data: 'id',
                         width: '40px',
                         orderable: false,
@@ -115,9 +107,7 @@
                         render: function(data, index, row, meta) {
                             return tableAction(row, function() {
                                 return actionOption('Edit', 'edit') +
-                                    actionOption('Remove', 'remove') +
-                                    actionDivider() +
-                                    actionOption('Example', 'example');
+                                    actionOption('Remove', 'remove');
                             });
                         }
                     }
@@ -132,9 +122,6 @@
                     case 'remove':
                         showDeleteConfirmation(data);
                         break;
-                    case 'example':
-                        showMessage('Ini contoh aksi terpisah', 'warning')
-                        break;
                 }
             });
 
@@ -146,10 +133,6 @@
                 swap('#container-form', '#container-table');
             });
 
-            $('input[name=name]').on('change keyup', function() {
-                $('input[name=slug]').val($(this).val().replace(/\s/g, ''));
-            });
-
             $('#form-role').formHandler({
                 rules: {
                     name: {
@@ -157,14 +140,16 @@
                     },
                     slug: {
                         required: true,
+                        noSpace: true
                     }
                 },
                 messages: {
                     name: {
-                        required: 'Nama wajib diisi'
+                        required: 'Nama fitur wajib diisi'
                     },
                     slug: {
-                        required: 'Slug wajib diisi'
+                        required: 'Nama routing wajib diisi',
+                        noSpace: 'Nama routing tidak boleh menggunakan spasi.'
                     },
                 },
             }, doStore)
@@ -192,7 +177,7 @@
 
         function removeData(id) {
             $.ajax({
-                url: url('master/role/remove'),
+                url: url('system/feature/remove'),
                 ...getHeaderToken(),
                 data: {
                     id: id
@@ -210,7 +195,7 @@
                     showMessage(payload.message, 'error')
                 },
                 complete: function(data) {
-                    datatable.ajax.reload();
+                    datatable.ajax.reload(null, false);
                 }
             })
         }
@@ -251,7 +236,7 @@
                 complete: function(data) {
                     loading(submitButton, false)
                     enable(submitButton);
-                    datatable.ajax.reload();
+                    datatable.ajax.reload(null, false);
                 }
             });
         }

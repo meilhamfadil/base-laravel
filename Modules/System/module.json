@@ -1,11 +1,11 @@
 {
-    "name": "Master",
-    "alias": "master",
+    "name": "System",
+    "alias": "system",
     "description": "",
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\Master\\Providers\\MasterServiceProvider"
+        "Modules\\System\\Providers\\SystemServiceProvider"
     ],
     "aliases": {},
     "files": [],

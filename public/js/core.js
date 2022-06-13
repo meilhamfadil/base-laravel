@@ -60,6 +60,10 @@ $.fn.serializeObject = function () {
     return o;
 };
 
+$.validator.addMethod("noSpace", function (value, element) {
+    return value.indexOf(" ") < 0 && value != "";
+}, "No space please and don't leave it empty");
+
 $.fn.formHandler = function (
     validator = {},
     action = function () {

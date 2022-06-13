@@ -76,7 +76,7 @@
         $('document').ready(function() {
             let datatable = $('table').DataTable({
                 ajax: {
-                    url: "/master/menu/datatable"
+                    url: "/system/menu/datatable"
                 },
                 columns: [{
                         data: 'id',
