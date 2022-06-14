@@ -15,9 +15,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')
     ->group(function () {
-        Route::get('/', 'LoginController@index')
-            ->middleware(['guest'])
-            ->name('login');
+        Route::get('/', function () {
+            return redirect()->route('login');
+        })->middleware(['guest']);
 
         Route::prefix('/login')
             ->middleware(['guest'])

@@ -9,7 +9,7 @@ class Feature extends Model
 {
     use HasFactory;
 
-    protected $table = 'feature';
+    protected $table = 'feature_permission';
 
     /**
      * The attributes that should be hidden for serialization.
@@ -17,7 +17,6 @@ class Feature extends Model
      * @var array<int, string>
      */
     protected $hidden = [
-        'deleted_at',
         'created_at',
         'updated_at',
     ];

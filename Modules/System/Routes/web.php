@@ -30,8 +30,7 @@ Route::prefix('system')
 
         Route::prefix('/feature')->group(function () {
             Route::get('/', 'FeatureController@index')->name('system-feature');
-            Route::post('/datatable', 'FeatureController@datatable')->name('system-feature-datatable');
-            Route::post('/store', 'FeatureController@store')->name('system-feature-store');
-            Route::delete('/remove', 'FeatureController@destroy')->name('system-feature-remove');
+            Route::get('/source/{role}', 'FeatureController@source')->name('system-feature-source');
+            Route::post('/map', 'FeatureController@map')->name('system-feature-map');
         });
     });

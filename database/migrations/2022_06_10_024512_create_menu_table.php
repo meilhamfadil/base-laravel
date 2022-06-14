@@ -13,25 +13,16 @@ class CreateMenuTable extends Migration
      */
     public function up()
     {
-        $data = [
-            'id' => '8',
-            'name' => 'Anak',
-            'type' => 'menu',
-            'parent' => '6',
-            'order' => '1',
-            'icon' => 'child',
-            'link' => '/childrens-room',
-            'target' => '_blank',
-        ];
         Schema::create('menu', function (Blueprint $table) {
             $table->id();
+            $table->integer('parent')->default(0);
             $table->string('name');
             $table->enum('type', ['label', 'menu'])->default('menu');
-            $table->integer('parent');
-            $table->integer('order');
-            $table->string('icon');
-            $table->string('link');
+            $table->string('icon')->nullable(true);
+            $table->string('link')->nullable(true);
+            $table->integer('order')->default(1);
             $table->enum('target', ['_self', '_blank'])->default('_self');
+            $table->boolean('manageable')->default(true);
             $table->softDeletes('deleted_at', 0);
             $table->timestamps();
         });

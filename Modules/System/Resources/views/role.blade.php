@@ -53,10 +53,12 @@
             <div class="card" id="container-table">
                 <div class="card-header">
                     <h3 class="card-title">Hak Akses</h3>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool add">
-                            <i class="fas fa-plus"></i></button>
-                    </div>
+                    @can('isSuperadmin')
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool add">
+                                <i class="fas fa-plus"></i></button>
+                        </div>
+                    @endcan
                 </div>
                 <div class="card-body">
                     <table class="table table-striped table-bordered">

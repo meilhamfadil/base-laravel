@@ -31,21 +31,18 @@ class CreateViewFeaturePermission extends Migration
     {
         return "CREATE OR REPLACE VIEW v_feature_permission AS SELECT 
             GROUP_CONCAT(fp.role_id) AS role_id, 
-            fp.feature_id AS feature_id, 
+            fp.route_name AS route_name, 
             GROUP_CONCAT(r.name) AS role_name,
-            GROUP_CONCAT(r.slug) AS role_slug, 
-            f.name AS feature_name, 
-            f.slug AS feature_slug 
+            GROUP_CONCAT(r.slug) AS role_slug
         FROM (
             feature_permission fp 
-            JOIN feature f ON (fp.feature_id = f.id)
             JOIN role r ON (fp.role_id = r.id)
         ) 
-        GROUP BY feature_id";
+        GROUP BY fp.route_name";
     }
 
     public function dropViewFeaturePermission()
     {
-        return "DROP VIEW IF EXISTS `view_user_data`";
+        return "DROP VIEW IF EXISTS `v_feature_permission`";
     }
 }

@@ -16,7 +16,7 @@ class CreateFeaturePermissionTable extends Migration
         Schema::create('feature_permission', function (Blueprint $table) {
             $table->id();
             $table->integer('role_id');
-            $table->integer('feature_id');
+            $table->string('route_name');
             $table->timestamps();
         });
     }

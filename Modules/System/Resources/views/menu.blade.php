@@ -21,7 +21,7 @@
 
         <div class="container-fluid">
 
-            <div class="card" id="container-filter">
+            <div class="card" id="container-filter" style="display: none;">
                 <div class="card-header">
                     <h3 class="card-title">Filter</h3>
                 </div>
@@ -32,8 +32,8 @@
                                 <div class="col-6">
                                     <div class="form-group">
                                         <label>Tipe:</label>
-                                        <select name="datatable[tipe]" class="form-control select2" style="width: 100%;">
-                                            <option value="">Pilih Tipe</option>
+                                        <select name="datatable[type]" class="form-control select2" style="width: 100%;">
+                                            <option value="">Semua</option>
                                             <option value="label">Label</option>
                                             <option value="menu">Menu</option>
                                         </select>

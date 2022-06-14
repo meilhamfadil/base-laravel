@@ -19,8 +19,9 @@ class MenuController extends AdminController
     {
         $params = $request->post('datatable');
         $query = Menu::query();
+        $query->where('manageable', true);
         if (isset($params['type']))
-            $query->where('type', 'like', '%' . $params['type'] . '%');
+            $query->where('type', $params['type']);
         return DataTables::of($query)->toJson();
     }
 }

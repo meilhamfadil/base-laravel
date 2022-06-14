@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Master Fitur</h1>
+                    <h1>Master Hak Akses Fitur</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -21,198 +21,133 @@
 
         <div class="container-fluid">
 
-            <div class="card" id="container-form" style="display: none">
-                <div class="card-header">
-                    <h3 class="card-title">Form Fitur</h3>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool close-form">
-                            <i class="fas fa-times"></i></button>
-                    </div>
-                </div>
-                <form action="{{ url('system/feature/store') }}" id="form-role">
+            <div class="card card-default">
+                <form action="{{ url('system/feature/map') }}" id="form-feature">
                     {{ csrf_field() }}
-                    <input type="hidden" name="id">
                     <div class="card-body">
-                        <div class="form-group">
-                            <label>Nama</label>
-                            <input type="text" name="name" class="form-control" placeholder="Nama Fitur">
+                        <div class="row">
+                            <div class="col-12">
+                                <select id="roles" class="select2 form-control" name="role_id">
+                                    <option value="-">Pilih Role</option>
+                                    @foreach ($roles as $role)
+                                        @if ($role->id != 1)
+                                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-12" id="select-container" style="display: none">
+                                <div class="form-group">
+                                    <select class="duallistbox" multiple="multiple" name="features"></select>
+                                </div>
+                                <button class="btn btn-primary float-right" type="submit">Simpan</button>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Nama Routing</label>
-                            <input type="text" name="slug" class="form-control" placeholder="Nama Routing">
-                        </div>
-                        <button type="submit" class="btn btn-primary float-right">Simpan</button>
                     </div>
                 </form>
             </div>
 
-            <div class="card" id="container-table">
-                <div class="card-header">
-                    <h3 class="card-title">Fitur</h3>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool add">
-                            <i class="fas fa-plus"></i></button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped table-bordered">
-                        <thead>
-                            <tr>
-                                <td class="text-center">No</td>
-                                <td class="text-center">Nama Fitur</td>
-                                <td class="text-center">Nama Routing</td>
-                                <td class="text-center"></td>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
-            </div>
         </div>
 
     </section>
 @endsection
 
+@section('css')
+    <style>
+        .moveall,
+        .removeall {
+            display: none !important;
+        }
+
+        .move {
+            margin-left: 0px !important;
+            border-top-left-radius: .25rem !important;
+        }
+
+        .remove {
+            border-top-right-radius: .25rem !important;
+        }
+
+        .filter {
+            margin-bottom: 0.75rem !important;
+        }
+
+        select {
+            border: 1px solid #6c757d !important;
+        }
+    </style>
+@endsection
 
 @section('js')
     <script>
-        let datatable;
+        let selectFeatures;
+        let origin;
 
         $('document').ready(function() {
 
-            datatable = $('table').DataTable({
-                ajax: {
-                    url: "/system/feature/datatable"
-                },
-                autoWidth: false,
-                columns: [{
-                        data: 'id',
-                        width: '40px',
-                        orderable: false,
-                        className: 'text-center',
-                        render: function(data, index, row, meta) {
-                            return `${meta.row + 1}`
-                        }
-                    },
-                    {
-                        data: 'name'
-                    },
-                    {
-                        data: 'slug'
-                    },
-                    {
-                        data: 'id',
-                        width: '40px',
-                        orderable: false,
-                        className: 'text-center',
-                        render: function(data, index, row, meta) {
-                            return tableAction(row, function() {
-                                return actionOption('Edit', 'edit') +
-                                    actionOption('Remove', 'remove');
-                            });
-                        }
-                    }
-                ]
-            });
+            selectFeatures = $('select[name=features]').bootstrapDualListbox({
+                selectorMinimalHeight: 275,
+                filterTextClear: 'Tampilkan semua',
+                filterPlaceHolder: 'Cari',
+                infoText: 'Menampilkan {0} data',
+                infoTextFiltered: '<span class="label label-warning">Menampilkan</span> {0} dari {1}',
+                infoTextEmpty: 'Data tidak ada',
+                removeAllLabel: "",
+                moveOnSelect: false,
+            })
 
-            $('table').setOnActionClickListener(function(type, data) {
-                switch (type) {
-                    case 'edit':
-                        prepareEdit(data);
-                        break;
-                    case 'remove':
-                        showDeleteConfirmation(data);
-                        break;
+            $('#form-feature').formHandler({
+                rules: {
+                    role_id: {
+                        required: true,
+                        number: true
+                    },
+                },
+                message: {
+                    role_id: {
+                        required: 'Role wajib diisi',
+                        number: 'Role harus berupa numerik'
+                    }
+                }
+            }, mapFeature);
+
+            $('#roles').on('change', function() {
+                let id = $(this).val();
+                if (isNaN(id)) {
+                    $("#select-container").slideUp();
+                } else {
+                    loadData(id);
                 }
             });
-
-            $('.add').on('click', function() {
-                swap('#container-table', '#container-form');
-            });
-
-            $('.close-form').on('click', function() {
-                swap('#container-form', '#container-table');
-            });
-
-            $('#form-role').formHandler({
-                rules: {
-                    name: {
-                        required: true,
-                    },
-                    slug: {
-                        required: true,
-                        noSpace: true
-                    }
-                },
-                messages: {
-                    name: {
-                        required: 'Nama fitur wajib diisi'
-                    },
-                    slug: {
-                        required: 'Nama routing wajib diisi',
-                        noSpace: 'Nama routing tidak boleh menggunakan spasi.'
-                    },
-                },
-            }, doStore)
-
         });
 
-        function showDeleteConfirmation(data) {
-            $.confirm({
-                title: 'Hapus Data',
-                content: `Anda yakin akan menghapus data ${data.name}?`,
-                buttons: {
-                    ya: {
-                        text: "Hapus",
-                        btnClass: 'btn-danger',
-                        action: function() {
-                            removeData(data.id)
-                        }
-                    },
-                    tidak: {
-                        text: "Tidak"
-                    }
-                }
-            });
-        }
-
-        function removeData(id) {
+        function loadData(role) {
             $.ajax({
-                url: url('system/feature/remove'),
-                ...getHeaderToken(),
-                data: {
-                    id: id
+                url: url('/system/feature/source/' + role),
+                beforeSend: function() {
+                    $("#select-container").slideUp();
                 },
-                type: DELETE,
-                dataType: JSON_DATA,
                 success: function(payload, message, xhr) {
-                    showMessage(
-                        payload.message,
-                        (payload.code == 200) ? 'success' : 'error'
-                    )
-                },
-                error: function(xhr, message, error) {
-                    let payload = xhr.responseJSON
-                    showMessage(payload.message, 'error')
-                },
-                complete: function(data) {
-                    datatable.ajax.reload(null, false);
+                    selectFeatures.empty();
+                    payload.data.options.forEach(item => {
+                        let option =
+                            `<option ${(item.selected) ? 'selected' : ''}>${item.name}</option>`
+                        selectFeatures.append(option);
+                    })
+                    selectFeatures.bootstrapDualListbox('refresh');
+                    $("#select-container").slideDown();
                 }
             })
         }
 
-        function prepareEdit(data) {
-            $('input[name=id]').val(data.id);
-            $('input[name=name]').val(data.name);
-            $('input[name=slug]').val(data.slug);
-            $('textarea[name=description]').val(data.description);
-            swap('#container-table', '#container-form');
-        }
-
-        function doStore(form) {
-            const submitButton = $('#form-role button[type=submit]');
+        function mapFeature(form) {
+            const submitButton = $('#form-feature button[type=submit]');
+            let data = $(form).serializeObject();
+            if (!Array.isArray(data.features))
+                data.features = [data.features];
             $.ajax({
                 url: $(form).attr('action'),
-                data: $(form).serializeObject(),
+                data: data,
                 type: POST,
                 dataType: JSON_DATA,
                 beforeSend: function() {
@@ -225,8 +160,8 @@
                         (payload.code == 200) ? 'success' : 'error'
                     )
                     if (payload.code == 200) {
-                        $('#form-role')[0].reset();
-                        swap('#container-form', '#container-table');
+                        $("#roles").select2('val', '-');
+                        $("#select-container").slideUp();
                     }
                 },
                 error: function(xhr, message, error) {
@@ -236,7 +171,6 @@
                 complete: function(data) {
                     loading(submitButton, false)
                     enable(submitButton);
-                    datatable.ajax.reload(null, false);
                 }
             });
         }
