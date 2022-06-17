@@ -29,31 +29,23 @@ class RoleController extends AdminController
             'slug' => 'required',
         ]);
 
+        $result = null;
         if ($request->post('id') != null) {
-            $request->validate([
-                'id' => 'required'
-            ]);
-            $data = Role::where('id', $request->post('id'))
+            $result = Role::where('id', $request->post('id'))
                 ->update([
                     'name' => $request->post('name'),
                     'slug' => $request->post('slug'),
                     'description' => $request->post('description'),
                 ]);
-
-            return $this->responseJson(
-                $data
-            );
         } else {
-            $insertId = Role::create([
+            $result = Role::create([
                 'name' => $request->post('name'),
                 'slug' => $request->post('slug'),
                 'description' => $request->post('description'),
             ])->id;
         }
 
-        return $this->responseJson(
-            $insertId
-        );
+        return $this->responseJson($result);
     }
 
     public function destroy(Request $request)

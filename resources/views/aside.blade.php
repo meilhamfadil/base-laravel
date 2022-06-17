@@ -31,9 +31,9 @@
                      <li class="nav-header" style="{{ $label->padding }}">{{ $label->name }}</li>
                      @foreach ($label->sub as $menu)
                          <li class="nav-item {{ $menu->subclass }} {{ $menu->open }}">
-                             <a href="{{ url(is_null($menu->link) ? '#' : $menu->link) }}"
-                                 class="nav-link {{ $menu->active }}" target="{{ $menu->target }}">
-                                 <i class="nav-icon fas fa-{{ $menu->icon }}"></i>
+                             <a href="{{ $menu->link }}" class="nav-link {{ $menu->active }}"
+                                 target="{{ $menu->target }}">
+                                 <i class="nav-icon {{ $menu->icon }}"></i>
                                  <p>
                                      {{ $menu->name }}
                                      @if (!empty($menu->sub))
@@ -44,9 +44,9 @@
                              @if (!empty($menu->sub))
                                  <ul class="nav nav-treeview">
                                      @foreach ($menu->sub as $sub)
-                                         <li class="nav-item">
-                                             <a href="{{ url(is_null($sub->link) ? '#' : $sub->link) }}"
-                                                 class="nav-link {{ $sub->active }}" target="{{ $sub->target }}">
+                                         <li class="nav-item ml-3">
+                                             <a href="{{ $sub->link }}" class="nav-link {{ $sub->active }}"
+                                                 target="{{ $sub->target }}">
                                                  <i class="far fa-circle nav-icon"></i>
                                                  <p>{{ $sub->name }}</p>
                                              </a>

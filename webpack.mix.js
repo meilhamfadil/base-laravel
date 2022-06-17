@@ -34,6 +34,7 @@ mix.scripts([
     'node_modules/admin-lte/plugins/jquery-validation/jquery.validate.min.js',
     'node_modules/admin-lte/plugins/jquery-validation/additional-methods.min.js',
     'node_modules/jquery-confirm/dist/jquery-confirm.min.js',
+    'node_modules/sortablejs/Sortable.js'
 ], 'public/js/plugin.js')
     .sourceMaps();
 

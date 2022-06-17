@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Blank Page</h1>
+                    <h1>Master Menu</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -21,7 +21,81 @@
 
         <div class="container-fluid">
 
-            <div class="card" id="container-filter" style="display: none;">
+            <div class="card" id="container-form" style="display: none">
+                <div class="card-header">
+                    <h3 class="card-title">Form Menu</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool close-form">
+                            <i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <form action="{{ url('system/menu/store') }}" id="form-menu">
+                    {{ csrf_field() }}
+                    <input type="hidden" name="id">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Label</label>
+                            <input type="text" name="name" class="form-control" placeholder="Label Menu">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipe:</label>
+                            <select name="type" class="form-control select2" style="width: 100%;">
+                                <option value="label">Label</option>
+                                <option value="menu" selected>Menu</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="form-target">
+                            <label>Target:</label>
+                            <select name="target" class="form-control select2" style="width: 100%;">
+                                <option value="_self">Tab Terbuka</option>
+                                <option value="_blank">Tab Baru</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="form-icon">
+                            <label>Icon</label>
+                            <input type="text" name="icon" class="form-control" placeholder="Font Awesome Icon Class">
+                        </div>
+                        <div class="form-group" id="form-link">
+                            <label>Link</label>
+                            <br>
+                            <div class="form-check d-inline mr-2">
+                                <input type="radio" name="link_type" value="endpoint">&nbsp;Endpoint
+                            </div>
+                            <div class="form-check d-inline mr-2">
+                                <input type="radio" name="link_type" value="link">&nbsp;Link
+                            </div>
+                            <div class="form-check d-inline mr-2">
+                                <input type="radio" name="link_type" value="feature">&nbsp;Feature
+                            </div>
+                            <div class="mb-2"></div>
+                            <div class="input-group mb-3" style="display: none" id="endpoint">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">/</span>
+                                </div>
+                                <input type="text" name="endpoint" class="form-control" placeholder="Endpoint">
+                            </div>
+                            <div class="input-group mb-3" style="display: none" id="link">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">
+                                        <i class="fab fa-edge"></i>
+                                    </span>
+                                </div>
+                                <input type="text" name="link" class="form-control" placeholder="Url">
+                            </div>
+                            <div id="feature" style="display: none;">
+                                <select name="feature" class="form-control select2" style="width: 100%;">
+                                    @foreach ($features as $feature)
+                                        <option>{{ $feature }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary float-right">Simpan</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card" id="container-filter" style="display: none">
                 <div class="card-header">
                     <h3 class="card-title">Filter</h3>
                 </div>
@@ -39,18 +113,27 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label>Parent:</label>
+                                        <select name="datatable[parent]" class="form-control select2-parent"
+                                            style="width: 100%;"></select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card" id="container-table">
                 <div class="card-header">
-                    <h3 class="card-title">Title</h3>
+                    <h3 class="card-title">Menu</h3>
                     <div class="card-tools">
                         <button type="button" class="btn btn-tool filter">
                             <i class="fas fa-filter"></i></button>
+                        <button type="button" class="btn btn-tool add">
+                            <i class="fas fa-plus"></i></button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -59,12 +142,17 @@
                             <tr>
                                 <td class="text-center">No</td>
                                 <td class="text-center">Nama</td>
+                                <td class="text-center">Parent Menu</td>
+                                <td class="text-center">Link / Target</td>
+                                <td class="text-center">Type</td>
+                                <td class="text-center">Status</td>
                                 <td class="text-center">Aksi</td>
                             </tr>
                         </thead>
                     </table>
                 </div>
             </div>
+
         </div>
 
     </section>
@@ -73,8 +161,9 @@
 
 @section('js')
     <script>
+        let datatable;
         $('document').ready(function() {
-            let datatable = $('table').DataTable({
+            datatable = $('table').DataTable({
                 ajax: {
                     url: "/system/menu/datatable"
                 },
@@ -88,9 +177,40 @@
                         data: 'name'
                     },
                     {
-                        data: 'id',
+                        data: 'parent',
                         render: function(data, index, row, meta) {
-                            return `datanya - ${data}`
+                            return (data === null) ? '-' : data.name;
+                        }
+                    },
+                    {
+                        data: 'link',
+                        render: function(data, index, row, meta) {
+                            return (data === null) ? '#' : data;
+                        }
+                    },
+                    {
+                        data: 'type',
+                        width: '40px',
+                        className: 'text-center'
+                    },
+                    {
+                        data: 'pid',
+                        width: '40px',
+                        className: 'text-center',
+                        render: function(data, index, row, meta) {
+                            return data == -1 ? 'Unmapped' : 'Mapped'
+                        }
+                    },
+                    {
+                        data: 'id',
+                        width: '40px',
+                        render: function(data, index, row, meta) {
+                            return tableAction(row, function() {
+                                return actionOption('Ubah', 'edit') +
+                                    actionOption('Hapus', 'remove') +
+                                    actionDivider() +
+                                    actionOption('Hak Akses', 'role');
+                            });
                         }
                     }
                 ],
@@ -104,18 +224,121 @@
                 $('#container-filter').toggle(500, 'swing')
             });
 
+            $('.add').on('click', function() {
+                swap('#container-table', '#container-form')
+            });
+
             $('#form-filter').on('change', 'select', function() {
-                console.log($(this).val())
                 datatable.ajax.reload();
             });
-        });
 
-        function renderAction(data, index, row, meta) {
-            return JSON.stringify(row)
-        }
+            $('.select2-parent').select2({
+                ajax: {
+                    url: url('system/menu/source'),
+                    dataType: 'json'
+                }
+            });
+
+            $('select[name=type]').on('change', function() {
+                if ($(this).val() == 'label') {
+                    $('#form-target').slideUp()
+                    $('#form-icon').slideUp()
+                    $('#form-link').slideUp()
+                } else {
+                    $('#form-target').slideDown()
+                    $('#form-icon').slideDown()
+                    $('#form-link').slideDown()
+                }
+            });
+
+            $('input[name=link_type]').on('change', function() {
+                switch ($(this).val()) {
+                    case 'link':
+                        $('#link').show();
+                        $('#endpoint').hide();
+                        $('#feature').hide();
+                        break;
+                    case 'endpoint':
+                        $('#link').hide();
+                        $('#endpoint').show();
+                        $('#feature').hide();
+                        break;
+                    case 'feature':
+                        $('#link').hide();
+                        $('#endpoint').hide();
+                        $('#feature').show();
+                        break;
+                }
+            });
+
+            $('#form-menu').formHandler({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    type: {
+                        required: true
+                    },
+                    link_type: {
+                        required: function(element) {
+                            return $('input[name=type]').val() == 'menu';
+                        }
+                    },
+                    link: {
+                        url: true,
+                        required: function(element) {
+                            return $('input[name=link_type]:checked').val() == 'link';
+                        }
+                    },
+                    endpoint: {
+                        required: function(element) {
+                            console.log($('input[name=link_type]').val())
+                            return $('input[name=link_type]:checked').val() == 'endpoint';
+                        }
+                    },
+                    feature: {
+                        required: function(element) {
+                            console.log($('input[name=link_type]').val())
+                            return $('input[name=link_type]:checked').val() == 'feature';
+                        }
+                    }
+                }
+            }, storeMenu)
+        });
 
         function buildDatatableParam() {
             return $('#form-filter').serializeObject();
+        }
+
+        function storeMenu(form) {
+            const submitButton = $('#form-menu button[type=submit]')
+            $.ajax({
+                url: $(form).attr('action'),
+                data: $(form).serializeObject(),
+                type: POST,
+                dataType: JSON_DATA,
+                before: function() {
+                    loading(submitButton, true);
+                    disable(submitButton);
+                },
+                success: function(payload, message, xhr) {
+                    if (payload.code == 200) {
+                        showMessage(message)
+                        $('#form-menu')[0].reset();
+                        swap('#container-form', '#container-table');
+                    } else {
+                        showMessage(message, 'error');
+                    }
+                },
+                error: function(xhr, message) {
+                    showMessage(message, 'error')
+                },
+                complete: function(payload) {
+                    loading(submitButton, false);
+                    enable(submitButton);
+                    datatable.ajax.reload();
+                }
+            })
         }
     </script>
 @endsection

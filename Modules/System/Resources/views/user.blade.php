@@ -5,12 +5,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Master Hak Akses</h1>
+                    <h1>Master Pengguna</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="#">Master</a></li>
-                        <li class="breadcrumb-item active">Hak Akses</li>
+                        <li class="breadcrumb-item active">Pengguna</li>
                     </ol>
                 </div>
             </div>
@@ -23,27 +23,37 @@
 
             <div class="card" id="container-form" style="display: none">
                 <div class="card-header">
-                    <h3 class="card-title">Form Hak Akses</h3>
+                    <h3 class="card-title">Form Pengguna</h3>
                     <div class="card-tools">
                         <button type="button" class="btn btn-tool close-form">
                             <i class="fas fa-times"></i></button>
                     </div>
                 </div>
-                <form action="{{ url('system/role/store') }}" id="form-role">
+                <form action="{{ url('system/user/store') }}" id="form-user">
                     {{ csrf_field() }}
                     <input type="hidden" name="id">
                     <div class="card-body">
                         <div class="form-group">
                             <label>Nama</label>
-                            <input type="text" name="name" class="form-control" placeholder="Nama Akses">
+                            <input type="text" name="name" class="form-control" placeholder="Nama Pengguna">
                         </div>
                         <div class="form-group">
-                            <label>Slug</label>
-                            <input type="text" name="slug" class="form-control" placeholder="Slug" readonly>
+                            <label>Email</label>
+                            <input type="email" name="email" class="form-control" placeholder="Email Pengguna">
                         </div>
                         <div class="form-group">
-                            <label>Deskripsi</label>
-                            <textarea name="description" class="form-control"></textarea>
+                            <label>Hak Akses Pengguna</label>
+                            <select name="role_id" class="form-control select2">
+                                <option value="">Pilih Hak Akses</option>
+                                @foreach ($roles as $role)
+                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Password</label>
+                            <p class="m-0">Semua password akan disetting secara default.</p>
+                            <small>Default Password : <span class="text-danger">password</span></small>
                         </div>
                         <button type="submit" class="btn btn-primary float-right">Simpan</button>
                     </div>
@@ -52,7 +62,7 @@
 
             <div class="card" id="container-table">
                 <div class="card-header">
-                    <h3 class="card-title">Hak Akses</h3>
+                    <h3 class="card-title">Pengguna</h3>
                     @can('isSuperadmin')
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool add">
@@ -66,8 +76,8 @@
                             <tr>
                                 <td class="text-center">No</td>
                                 <td class="text-center">Nama</td>
-                                <td class="text-center">Slug</td>
-                                <td class="text-center">Deskripsi</td>
+                                <td class="text-center">Email</td>
+                                <td class="text-center">Role</td>
                                 <td class="text-center"></td>
                             </tr>
                         </thead>
@@ -88,7 +98,7 @@
 
             datatable = $('table').DataTable({
                 ajax: {
-                    url: "/system/role/datatable"
+                    url: "/system/user/datatable"
                 },
                 autoWidth: false,
                 columns: [{
@@ -104,10 +114,13 @@
                         data: 'name'
                     },
                     {
-                        data: 'slug'
+                        data: 'email',
+                        render: function(data, index, row, meta) {
+                            return `<a href="mailto:${data}">${data}</a>`;
+                        }
                     },
                     {
-                        data: 'description'
+                        data: 'role.name'
                     },
                     {
                         data: 'id',
@@ -118,7 +131,8 @@
                             return tableAction(row, function() {
                                 return actionOption('Ubah', 'edit') +
                                     actionOption('Hapus', 'remove') +
-                                    actionDivider();
+                                    actionDivider() +
+                                    actionOption('Ganti Password', 'password');
                             });
                         }
                     }
@@ -132,6 +146,9 @@
                         break;
                     case 'remove':
                         showDeleteConfirmation(data);
+                        break;
+                    case 'password':
+                        showPasswordDialog(data);
                         break;
                 }
             });
@@ -148,12 +165,13 @@
                 $('input[name=slug]').val($(this).val().replace(/\s/g, ''));
             });
 
-            $('#form-role').formHandler({
+            $('#form-user').formHandler({
                 rules: {
                     name: {
                         required: true,
                     },
-                    slug: {
+                    email: VALIDATOR.email,
+                    role_id: {
                         required: true,
                     }
                 },
@@ -161,8 +179,9 @@
                     name: {
                         required: 'Nama wajib diisi'
                     },
-                    slug: {
-                        required: 'Slug wajib diisi'
+                    email: VALIDATOR_MESSAGES.email,
+                    role_id: {
+                        required: 'Hak akses wajib dipilih'
                     },
                 },
             }, doStore)
@@ -190,7 +209,7 @@
 
         function removeData(id) {
             $.ajax({
-                url: url('system/role/remove'),
+                url: url('system/user/remove'),
                 ...getHeaderToken(),
                 data: {
                     id: id
@@ -216,13 +235,13 @@
         function prepareEdit(data) {
             $('input[name=id]').val(data.id);
             $('input[name=name]').val(data.name);
-            $('input[name=slug]').val(data.slug);
-            $('textarea[name=description]').val(data.description);
+            $('input[name=email]').val(data.email);
+            $('select[name=role_id]').select2('val', data.role_id.toString());
             swap('#container-table', '#container-form');
         }
 
         function doStore(form) {
-            const submitButton = $('#form-role button[type=submit]');
+            const submitButton = $('#form-user button[type=submit]');
             $.ajax({
                 url: $(form).attr('action'),
                 data: $(form).serializeObject(),
@@ -238,7 +257,8 @@
                         (payload.code == 200) ? 'success' : 'error'
                     )
                     if (payload.code == 200) {
-                        $('#form-role')[0].reset();
+                        $('#form-user')[0].reset();
+                        $('select[name=role_id]').select2('val', '');
                         swap('#container-form', '#container-table');
                     }
                 },
@@ -249,6 +269,82 @@
                 complete: function(data) {
                     loading(submitButton, false)
                     enable(submitButton);
+                    datatable.ajax.reload(null, false);
+                }
+            });
+        }
+
+        function showPasswordDialog(data) {
+            const target = url('system/user/password');
+            $.confirm({
+                title: 'Ganti Password',
+                content: `<form action="${target}" id="form-password">` +
+                    `<input type="hidden" name="id" value="${data.id}"/>` +
+                    `<div class="form-group">` +
+                    `<input type="password" placeholder="Password Baru" name="password" class="form-control" />` +
+                    `</div>` +
+                    `<div class="form-group">` +
+                    `<input type="password" placeholder="Ulangi Password" name="retype" class="form-control"/>` +
+                    `</div>` +
+                    `</form>`,
+                buttons: {
+                    ya: {
+                        text: 'Ubah Password',
+                        btnClass: 'btn-primary',
+                        action: function() {
+                            const valid = $('#form-password').valid();
+                            if (valid)
+                                $("#form-password").submit();
+                            return valid;
+                        }
+                    },
+                    batal: {
+                        text: 'Batal'
+                    }
+                },
+                onContentReady: function() {
+                    $('#form-password').formHandler({
+                        rules: {
+                            password: {
+                                required: true
+                            },
+                            retype: {
+                                required: true,
+                                equalTo: 'input[name=password]'
+                            }
+                        },
+                        messages: {
+                            password: {
+                                required: "Password wajib diisi"
+                            },
+                            retype: {
+                                required: "Password wajib diulangi",
+                                equalTo: "Password harus sama"
+                            }
+                        }
+                    }, changePassword)
+                }
+            });
+        }
+
+        function changePassword(form) {
+            $.ajax({
+                url: $(form).attr('action'),
+                ...getHeaderToken(),
+                data: $(form).serializeObject(),
+                type: POST,
+                dataType: JSON_DATA,
+                success: function(payload, message, xhr) {
+                    showMessage(
+                        payload.message,
+                        (payload.code == 200) ? 'success' : 'error'
+                    )
+                },
+                error: function(xhr, message, error) {
+                    let payload = xhr.responseJSON
+                    showMessage(payload.message, 'error')
+                },
+                complete: function(data) {
                     datatable.ajax.reload(null, false);
                 }
             });

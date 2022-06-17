@@ -38,11 +38,28 @@ class AuthServiceProvider extends ServiceProvider
                 });
             }
 
-            $routes = ViewFeaturePermission::all();
-            foreach ($routes as $route) {
-                Gate::define($route->route_name, function ($user) use ($route) {
-                    $needed = preg_split('/\,/', $route->role_id);
-                    return in_array($user->role_id, $needed);
+            $permissions = array_reduce($roles->toArray(), function ($acc, $cur) {
+                $features = preg_split('/,/', $cur['permissions']);
+                $columns = array_column($acc, 'name');
+                foreach ($features as $feature) {
+                    if ($feature != "" && !is_null($feature)) {
+                        $index = array_search($feature, $columns);
+                        if (is_int($index)) {
+                            $acc[$index]['ids'][] = $cur['id'];
+                        } else {
+                            $acc[] = [
+                                'name' => $feature,
+                                'ids' => [$cur['id']]
+                            ];
+                        }
+                    }
+                }
+                return $acc;
+            }, []);
+
+            foreach ($permissions as $route) {
+                Gate::define($route['name'], function ($user) use ($route) {
+                    return in_array($user->role_id, $route['ids']);
                 });
             }
         } catch (Exception $e) {

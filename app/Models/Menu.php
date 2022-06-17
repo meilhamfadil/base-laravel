@@ -29,10 +29,16 @@ class Menu extends Model
     protected $fillable = [
         'name',
         'type',
+        'role_ids',
         'parent',
         'order',
         'icon',
         'link',
         'target'
     ];
+
+    public function parent()
+    {
+        return $this->belongsTo(Menu::class, 'parent');
+    }
 }

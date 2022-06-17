@@ -18,14 +18,10 @@ class FeatureController extends AdminController
 
     public function map(Request $request)
     {
-        Feature::where('role_id', $request->post('role_id'))->delete();
-        $feature = array_map(function ($item) use ($request) {
-            return [
-                'role_id' => $request->post('role_id'),
-                'route_name' => $item
-            ];
-        }, $request->post('features'));
-        Feature::insert($feature);
+        Role::where('id', $request->post('role_id'))
+            ->update([
+                'permissions' => join(',', $request->post('features'))
+            ]);
         return $this->responseJson(null, 'Pemetaan fitur telah tersimpan');
     }
 
@@ -33,7 +29,8 @@ class FeatureController extends AdminController
     {
         $feature = [];
 
-        $mapped = Feature::select('route_name')->where('role_id', $role)->pluck('route_name')->toArray();
+        $mapped = Role::where('id', $role)->pluck('permissions')->first();
+        $mapped = preg_split('/,/', $mapped);
         $routes = Route::getRoutes();
 
         foreach ($routes as $route) {

@@ -22,6 +22,8 @@
         "admin-lte": "3.0",
         "datatables.net": "^1.12.1",
         "jquery-confirm": "^3.3.4",
-        "sizzle": "^2.3.6"
+        "jquery-sortable-lists": "^1.0.13",
+        "sizzle": "^2.3.6",
+        "sortablejs": "^1.15.0"
     }
 }

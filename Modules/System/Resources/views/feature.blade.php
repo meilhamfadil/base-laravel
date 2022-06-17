@@ -47,6 +47,29 @@
                 </form>
             </div>
 
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Hak Akses</th>
+                                <th>Fitur</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($roles as $role)
+                                <tr>
+                                    <td>{{ $role->name }}</td>
+                                    <td class="role" data-id="{{ $role->id }}">
+                                        {{ $role->id == 1 ? 'Akses Seluruh Fitur' : $role->permissions }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
 
     </section>
@@ -92,7 +115,7 @@
                 infoText: 'Menampilkan {0} data',
                 infoTextFiltered: '<span class="label label-warning">Menampilkan</span> {0} dari {1}',
                 infoTextEmpty: 'Data tidak ada',
-                removeAllLabel: "",
+                removeAllLabel: '',
                 moveOnSelect: false,
             })
 
@@ -114,7 +137,7 @@
             $('#roles').on('change', function() {
                 let id = $(this).val();
                 if (isNaN(id)) {
-                    $("#select-container").slideUp();
+                    $('#select-container').slideUp();
                 } else {
                     loadData(id);
                 }
@@ -125,7 +148,7 @@
             $.ajax({
                 url: url('/system/feature/source/' + role),
                 beforeSend: function() {
-                    $("#select-container").slideUp();
+                    $('#select-container').slideUp();
                 },
                 success: function(payload, message, xhr) {
                     selectFeatures.empty();
@@ -135,7 +158,7 @@
                         selectFeatures.append(option);
                     })
                     selectFeatures.bootstrapDualListbox('refresh');
-                    $("#select-container").slideDown();
+                    $('#select-container').slideDown();
                 }
             })
         }
@@ -160,8 +183,9 @@
                         (payload.code == 200) ? 'success' : 'error'
                     )
                     if (payload.code == 200) {
-                        $("#roles").select2('val', '-');
-                        $("#select-container").slideUp();
+                        $('#roles').select2('val', '-');
+                        $('#select-container').slideUp();
+                        $(`.role[data-id=${data.role_id}]`).text(data.features.join());
                     }
                 },
                 error: function(xhr, message, error) {

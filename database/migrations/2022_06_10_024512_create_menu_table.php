@@ -16,6 +16,7 @@ class CreateMenuTable extends Migration
         Schema::create('menu', function (Blueprint $table) {
             $table->id();
             $table->integer('parent')->default(0);
+            $table->text('role_ids')->nullable();
             $table->string('name');
             $table->enum('type', ['label', 'menu'])->default('menu');
             $table->string('icon')->nullable(true);
