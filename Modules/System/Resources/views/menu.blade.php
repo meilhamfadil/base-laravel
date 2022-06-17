@@ -40,8 +40,8 @@
                         <div class="form-group">
                             <label>Tipe:</label>
                             <select name="type" class="form-control select2" style="width: 100%;">
+                                <option value="menu">Menu</option>
                                 <option value="label">Label</option>
-                                <option value="menu" selected>Menu</option>
                             </select>
                         </div>
                         <div class="form-group" id="form-target">
@@ -161,6 +161,7 @@
 
 @section('js')
     <script>
+        const roles = JSON.parse('{!! $roles !!}');
         let datatable;
         $('document').ready(function() {
             datatable = $('table').DataTable({
@@ -220,12 +221,107 @@
                 }
             });
 
+            $('table').setOnActionClickListener(function(type, data) {
+                switch (type) {
+                    case 'edit':
+                        $('input[name=id]').val(data.id)
+                        $('input[name=name]').val(data.name)
+                        $('input[name=icon]').val(data.icon)
+                        if (data.link == null) {
+                            $('#form-target').slideUp()
+                            $('#form-icon').slideUp()
+                            $('#form-link').slideUp()
+                        } else {
+                            $('#form-target').slideDown()
+                            $('#form-icon').slideDown()
+                            $('#form-link').slideDown()
+                        }
+
+                        if (data.link != null && data.link.includes('http')) {
+                            $('input[name=link]').val(data.link)
+                            $('input[value=link]').attr('checked', 'checked')
+                            $('#link').show();
+                            $('#endpoint').hide();
+                            $('#feature').hide();
+                        } else if (data.link != null && data.link.startsWith('/')) {
+                            $('input[name=endpoint]').val(data.link)
+                            $('input[value=endpoint]').attr('checked', 'checked')
+                            $('#link').hide();
+                            $('#endpoint').show();
+                            $('#feature').hide();
+                        } else if (data.link != null) {
+                            $('input[name=feature]').val(data.link)
+                            $('input[value=feature]').attr('checked', 'checked')
+                            $('#link').hide();
+                            $('#endpoint').hide();
+                            $('#feature').show();
+                        }
+                        $('select[name=type]').val(data.type).trigger('change')
+                        $('select[name=target]').val(data.target).trigger('change')
+                        swap('#container-table', '#container-form')
+                        break;
+                    case 'remove':
+                        showDeleteConfirmation(data);
+                        break;
+                    case 'role':
+                        const target = url('system/menu/role');
+                        let content = '';
+                        content += `<form action="${target}" id="form-role">` +
+                            `<input type="hidden" name="id" value="${data.id}"/>`;
+                        roles.forEach(function(item) {
+                            content += `<div class="form-group">` +
+                                `<div class="custom-control custom-checkbox">` +
+                                `<input class="custom-control-input" type="checkbox" id="cb${item.id}" name="role_ids[]" value="${item.id}">` +
+                                `<label for="cb${item.id}" class="custom-control-label">${item.name}</label>` +
+                                `</div>` +
+                                `</div>`;
+                        });
+                        content += `</form>`;
+                        $.confirm({
+                            title: 'Hak Akses',
+                            content: content,
+                            buttons: {
+                                ya: {
+                                    text: 'Simpan',
+                                    btnClass: 'btn-primary',
+                                    action: function() {
+                                        const valid = $('#form-role').valid();
+                                        if (valid)
+                                            $("#form-role").submit();
+                                        return valid;
+                                    }
+                                },
+                                batal: {
+                                    text: 'Batal'
+                                }
+                            },
+                            onContentReady: function() {
+                                $('input:checkbox').removeAttr('checked');
+                                roles.forEach(function(item) {
+                                    console.log(item.id, data.role_ids)
+                                    if (data.role_ids != null) {
+                                        if (`,${item.id},`.includes(data.role_ids))
+                                            $('#cb' + item.id).attr('checked',
+                                                'checked')
+                                    }
+                                });
+                                $('#form-role').formHandler({}, updateRole)
+                            }
+                        });
+                        break;
+                }
+            });
+
             $('.filter').on('click', function() {
                 $('#container-filter').toggle(500, 'swing')
             });
 
             $('.add').on('click', function() {
                 swap('#container-table', '#container-form')
+            });
+
+            $('.close-form').on('click', function() {
+                swap('#container-form', '#container-table')
             });
 
             $('#form-filter').on('change', 'select', function() {
@@ -310,6 +406,25 @@
             return $('#form-filter').serializeObject();
         }
 
+        function showDeleteConfirmation(data) {
+            $.confirm({
+                title: 'Hapus Data',
+                content: `Anda yakin akan menghapus data ${data.name}?`,
+                buttons: {
+                    ya: {
+                        text: "Hapus",
+                        btnClass: 'btn-danger',
+                        action: function() {
+                            removeData(data.id)
+                        }
+                    },
+                    tidak: {
+                        text: "Tidak"
+                    }
+                }
+            });
+        }
+
         function storeMenu(form) {
             const submitButton = $('#form-menu button[type=submit]')
             $.ajax({
@@ -337,6 +452,55 @@
                     loading(submitButton, false);
                     enable(submitButton);
                     datatable.ajax.reload();
+                }
+            })
+        }
+
+        function updateRole(form) {
+            $.ajax({
+                url: $(form).attr('action'),
+                ...getHeaderToken(),
+                data: $(form).serializeObject(),
+                type: POST,
+                dataType: JSON_DATA,
+                success: function(payload, message, xhr) {
+                    if (payload.code == 200) {
+                        showMessage(message)
+                        swap('#container-form', '#container-table');
+                    } else {
+                        showMessage(message, 'error');
+                    }
+                },
+                error: function(xhr, message) {
+                    showMessage(message, 'error')
+                },
+                complete: function(payload) {
+                    datatable.ajax.reload();
+                }
+            })
+        }
+
+        function removeData(id) {
+            $.ajax({
+                url: url('system/menu/remove'),
+                ...getHeaderToken(),
+                data: {
+                    id: id
+                },
+                type: DELETE,
+                dataType: JSON_DATA,
+                success: function(payload, message, xhr) {
+                    showMessage(
+                        payload.message,
+                        (payload.code == 200) ? 'success' : 'error'
+                    )
+                },
+                error: function(xhr, message, error) {
+                    let payload = xhr.responseJSON
+                    showMessage(payload.message, 'error')
+                },
+                complete: function(data) {
+                    datatable.ajax.reload(null, false);
                 }
             })
         }

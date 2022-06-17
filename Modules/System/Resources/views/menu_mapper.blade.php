@@ -70,7 +70,7 @@
                         <div class="card-header">
                             <h3 class="card-title">Mapped</h3>
                             <div class="card-tools">
-                                <button type="button" id="save" class="btn btn-tool close-form" style="display: none">
+                                <button type="button" id="save" class="btn btn-tool close-form">
                                     <i class="fas fa-save"></i></button>
                             </div>
                         </div>
@@ -78,19 +78,20 @@
                             <div id="nested-main" class="list-group col nested-sortable">
                                 @foreach ($menus as $label)
                                     <div data-sortable-id="{{ $label->id }}" class="list-group-item nested-1">
-                                        {{ $label->name }} <small class="text-primary">{{ $label->link }}</small>
+                                        <span>{{ $label->name }}</span>
+                                        <small class="text-primary">{{ $label->link }}</small>
                                         <div class="list-group nested-sortable">
                                             @foreach ($label->sub as $main)
                                                 <div data-sortable-id="{{ $main->id }}"
                                                     class="list-group-item nested-2">
-                                                    {{ $main->name }} <small
-                                                        class="text-primary">{{ $main->link }}</small>
+                                                    <span>{{ $main->name }}</span>
+                                                    <small class="text-primary">{{ $main->link }}</small>
                                                     <div class="list-group nested-sortable">
                                                         @foreach ($main->sub as $sub)
                                                             <div data-sortable-id="{{ $sub->id }}"
                                                                 class="list-group-item nested-3">
-                                                                {{ $sub->name }} <small
-                                                                    class="text-primary">{{ $sub->link }}</small>
+                                                                {{ $sub->name }}
+                                                                <small class="text-primary">{{ $sub->link }}</small>
                                                                 <div class="list-group nested-sortable"></div>
                                                             </div>
                                                         @endforeach
@@ -129,7 +130,31 @@
 
 @section('css')
     <style>
+        ul,
+        li {
+            margin: 0;
+            padding: 0;
+        }
 
+        li {
+            list-style: none
+        }
+
+        .list-group .list-group-item {
+            background: #ffffff;
+        }
+
+        .list-group .list-group-item .list-group .list-group-item {
+            background: #f6f6f6;
+        }
+
+        .list-group .list-group-item .list-group .list-group-item .list-group .list-group-item {
+            background: #ffffff;
+        }
+
+        .list-moving-class {
+            background: #e9e9e9 !important;
+        }
     </style>
 @endsection
 
@@ -155,10 +180,11 @@
                         }
                     },
                     animation: 150,
+                    ghostClass: 'list-moving-class',
                     fallbackOnBody: true,
                     swapThreshold: 0.65,
                     onMove: function(evt, originalEvent) {
-                        $('#save').slideDown();
+
                     },
                 });
             }
@@ -174,15 +200,14 @@
                     data: data,
                     type: POST,
                     dataType: JSON_DATA,
-                    before: function() {
-                        loading($('#save'), true);
-                    },
                     success: function(payload, message, xhr) {
-                        showMessage(payload.message)
+                        showMessage(
+                            payload.message,
+                            payload.code == 200 ? 'success' : 'error'
+                        )
                     },
                     complete: function(data) {
-                        loading($('#save'), false)
-                        showMessage('hehe')
+                        location.reload()
                     }
                 })
             });

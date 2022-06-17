@@ -4,6 +4,7 @@ namespace Modules\System\Http\Controllers;
 
 use App\Http\Controllers\AdminController;
 use App\Models\Menu;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Yajra\DataTables\DataTables;
@@ -14,6 +15,12 @@ class MenuController extends AdminController
     public function index()
     {
         $this->content['features'] = $this->getFeatures();
+        $this->content['roles'] = json_encode(
+            Role::select('id', 'name')
+                ->where('slug', '!=', 'Superadmin')
+                ->get()
+                ->toArray()
+        );
         return view('system::menu', $this->content);
     }
 
@@ -78,6 +85,33 @@ class MenuController extends AdminController
         }
 
         return $this->responseJson($result);
+    }
+
+    public function role(Request $request)
+    {
+        $data = $request->validate(['id' => 'required']);
+        $ids = $request->post('role_ids');
+
+        if (!is_null($ids))
+            $ids = join(',', $ids);
+        Menu::where('id', $data['id'])
+            ->update([
+                'role_ids' => ',' . $ids . ','
+            ]);
+
+        return $this->responseJson();
+    }
+
+    public function destroy(Request $request)
+    {
+        $id = $request->post('id');
+        $result = Menu::destroy($id);
+        return $this->responseJson(
+            $result,
+            ($result == 0) ? 'Gagal menghapus data' : 'Data berhasil dihapus',
+            ($result == 0) ? 400 : 200,
+            ($result == 0) ? 400 : 200
+        );
     }
 
     public function mapper()

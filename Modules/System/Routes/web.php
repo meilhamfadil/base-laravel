@@ -24,6 +24,7 @@ Route::prefix('system')
             Route::post('/map', 'MenuController@map')->name('system-menu-map');
             Route::post('/store', 'MenuController@store')->name('system-menu-store');
             Route::delete('/remove', 'MenuController@destroy')->name('system-menu-remove');
+            Route::post('/role', 'MenuController@role')->name('system-menu-role');
         });
 
         Route::prefix('/role')->group(function () {
