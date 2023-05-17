@@ -5,7 +5,7 @@
      <a href="{{ url('') }}" class="brand-link">
          <img src="/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
              style="opacity: .8">
-         <span class="brand-text font-weight-light">Base Projek</span>
+         <span class="brand-text font-weight-light">Base Project</span>
      </a>
      <!-- Sidebar -->
      <div class="sidebar">
